@@ -363,6 +363,7 @@ def detect(model, dataset_dir, subset):
     print("Running on {}".format(dataset_dir))
 
     # Create directory
+    print("Results will be in {}".format(RESULTS_DIR))
     if not os.path.exists(RESULTS_DIR):
         os.makedirs(RESULTS_DIR)
     submit_dir = "submit_{:%Y%m%dT%H%M%S}".format(datetime.datetime.now())
