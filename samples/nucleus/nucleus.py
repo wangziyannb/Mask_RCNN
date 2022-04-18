@@ -148,7 +148,7 @@ class NucleusConfig(Config):
 
     # If enabled, resizes instance masks to a smaller size to reduce
     # memory load. Recommended when using high-resolution images.
-    USE_MINI_MASK = True
+    USE_MINI_MASK = False
     MINI_MASK_SHAPE = (56, 56)  # (height, width) of the mini-mask
 
     # Number of ROIs per image to feed to classifier/mask heads
@@ -174,7 +174,6 @@ class NucleusInferenceConfig(NucleusConfig):
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more propsals.
     RPN_NMS_THRESHOLD = 0.7
-
 
 ############################################################
 #  Dataset

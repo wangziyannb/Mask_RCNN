@@ -521,7 +521,7 @@ def minimize_mask(bbox, mask, mini_shape):
 
     See inspect_data.ipynb notebook for more details.
     """
-    mini_mask = np.zeros(mini_shape + (mask.shape[-1],), dtype=bool)
+    mini_mask = np.zeros(mini_shape + (mask.shape[-1],), dtype=np.bool_)
     for i in range(mask.shape[-1]):
         # Pick slice and cast to bool in case load_mask() returned wrong dtype
         m = mask[:, :, i].astype(bool)
@@ -531,7 +531,7 @@ def minimize_mask(bbox, mask, mini_shape):
             raise Exception("Invalid bounding box with area of zero")
         # Resize with bilinear interpolation
         m = resize(m, mini_shape)
-        mini_mask[:, :, i] = np.around(m).astype(np.bool)
+        mini_mask[:, :, i] = np.around(m).astype(bool)
     return mini_mask
 
 
@@ -541,7 +541,7 @@ def expand_mask(bbox, mini_mask, image_shape):
 
     See inspect_data.ipynb notebook for more details.
     """
-    mask = np.zeros(image_shape[:2] + (mini_mask.shape[-1],), dtype=bool)
+    mask = np.zeros(image_shape[:2] + (mini_mask.shape[-1],), dtype=np.bool_)
     for i in range(mask.shape[-1]):
         m = mini_mask[:, :, i]
         y1, x1, y2, x2 = bbox[i][:4]
@@ -549,7 +549,7 @@ def expand_mask(bbox, mini_mask, image_shape):
         w = x2 - x1
         # Resize with bilinear interpolation
         m = resize(m, (h, w))
-        mask[y1:y2, x1:x2, i] = np.around(m).astype(np.bool)
+        mask[y1:y2, x1:x2, i] = np.around(m).astype(bool)
     return mask
 
 
@@ -569,7 +569,7 @@ def unmold_mask(mask, bbox, image_shape):
     threshold = 0.5
     y1, x1, y2, x2 = bbox
     mask = resize(mask, (y2 - y1, x2 - x1))
-    mask = np.where(mask >= threshold, 1, 0).astype(np.bool)
+    mask = np.where(mask >= threshold, 1, 0).astype(bool)
 
     # Put the mask in the right location.
     full_mask = np.zeros(image_shape[:2], dtype=np.bool)

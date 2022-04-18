@@ -1274,7 +1274,7 @@ def load_image_gt(dataset, config, image_id, augmentation=None):
         assert image.shape == image_shape, "Augmentation shouldn't change image size"
         assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
         # Change mask back to bool
-        mask = mask.astype(np.bool)
+        mask = mask.astype(bool)
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
@@ -1440,7 +1440,7 @@ def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
 
         if config.USE_MINI_MASK:
             # Create a mask placeholder, the size of the image
-            placeholder = np.zeros(config.IMAGE_SHAPE[:2], dtype=bool)
+            placeholder = np.zeros(config.IMAGE_SHAPE[:2], dtype=np.bool_)
             # GT box
             gt_y1, gt_x1, gt_y2, gt_x2 = gt_boxes[gt_id]
             gt_w = gt_x2 - gt_x1
@@ -1494,7 +1494,7 @@ def build_rpn_targets(image_shape, anchors, gt_class_ids, gt_boxes, config):
         no_crowd_bool = (crowd_iou_max < 0.001)
     else:
         # All anchors don't intersect a crowd
-        no_crowd_bool = np.ones([anchors.shape[0]], dtype=bool)
+        no_crowd_bool = np.ones([anchors.shape[0]], dtype=np.bool_)
 
     # Compute overlaps [num_anchors, num_gt_boxes]
     overlaps = utils.compute_overlaps(anchors, gt_boxes)
@@ -1881,11 +1881,11 @@ class MaskRCNN(object):
                 input_gt_masks = KL.Input(
                     shape=[config.MINI_MASK_SHAPE[0],
                            config.MINI_MASK_SHAPE[1], None],
-                    name="input_gt_masks", dtype=bool)
+                    name="input_gt_masks", dtype=np.bool_)
             else:
                 input_gt_masks = KL.Input(
                     shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1], None],
-                    name="input_gt_masks", dtype=bool)
+                    name="input_gt_masks", dtype=np.bool_)
         elif mode == "inference":
             # Anchors in normalized coordinates
             input_anchors = KL.Input(shape=[None, 4], name="input_anchors")
@@ -2357,7 +2357,7 @@ class MaskRCNN(object):
         if os.name == 'nt':
             workers = 0
         else:
-            workers = multiprocessing.cpu_count()
+            workers = 1
 
         self.keras_model.fit(
             train_generator,
@@ -2368,8 +2368,8 @@ class MaskRCNN(object):
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=workers,
-            use_multiprocessing=workers > 1,
+            workers=1,
+            use_multiprocessing=False,
         )
         self.epoch = max(self.epoch, epochs)
 
